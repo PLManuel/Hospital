@@ -17,6 +17,7 @@ import com.hospital.schedule_service.dto.EmployeeDTO;
 import com.hospital.schedule_service.dto.OfficeDTO;
 import com.hospital.schedule_service.dto.ScheduleRequestDTO;
 import com.hospital.schedule_service.dto.ScheduleResponseDTO;
+import com.hospital.schedule_service.dto.ScheduleUpdateDTO;
 import com.hospital.schedule_service.dto.SpecialtyDTO;
 import com.hospital.schedule_service.model.Schedule;
 import com.hospital.schedule_service.repository.ScheduleRepository;
@@ -82,6 +83,16 @@ public class ScheduleService {
     if (!officeHasSpecialty) {
       throw new IllegalArgumentException("El consultorio no está asignado a la especialidad: " + specialty.getName());
     }
+
+    List<Schedule> schedules = scheduleRepository.findByStartTimeBetween(dto.getStartTime(), dto.getEndTime());
+    schedules.stream()
+        .filter(existingSchedule -> existingSchedule.getOfficeId().equals(dto.getOfficeId()) &&
+            dto.getStartTime().isBefore(existingSchedule.getEndTime()) &&
+            dto.getEndTime().isAfter(existingSchedule.getStartTime()))
+        .findFirst()
+        .ifPresent(existingSchedule -> {
+          throw new IllegalArgumentException("El consultorio ya tiene una programación en este horario");
+        });
 
     Schedule schedule = Schedule.builder()
         .doctorDni(dto.getDoctorDni())
@@ -178,6 +189,45 @@ public class ScheduleService {
         .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con ID: " + id));
     schedule.setStatus(true);
     scheduleRepository.save(schedule);
+  }
+
+  public ScheduleResponseDTO updateSchedule(Long id, ScheduleUpdateDTO scheduleUpdateDTO) {
+    @SuppressWarnings("null")
+    Schedule schedule = scheduleRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con ID: " + id));
+
+    OfficeDTO office = officeServiceClient.getOfficeById(scheduleUpdateDTO.getOfficeId());
+    if (office == null) {
+      throw new IllegalArgumentException("Consultorio no encontrado con ID: " + scheduleUpdateDTO.getOfficeId());
+    }
+    if (Boolean.FALSE.equals(office.getStatus())) {
+      throw new IllegalArgumentException("El consultorio está deshabilitado");
+    }
+
+    boolean officeHasSpecialty = office.getSpecialtyIds() != null &&
+        office.getSpecialtyIds().contains(schedule.getSpecialtyId());
+
+    if (!officeHasSpecialty) {
+      throw new IllegalArgumentException(
+          "El consultorio no está asignado a la especialidad con ID: " + schedule.getOfficeId());
+    }
+
+    List<Schedule> schedules = scheduleRepository.findByStartTimeBetween(schedule.getStartTime(),
+        schedule.getEndTime());
+    schedules.stream()
+        .filter(existingSchedule -> existingSchedule.getOfficeId().equals(scheduleUpdateDTO.getOfficeId()) &&
+            schedule.getStartTime().isBefore(existingSchedule.getEndTime()) &&
+            schedule.getEndTime().isAfter(existingSchedule.getStartTime()))
+        .findFirst()
+        .ifPresent(existingSchedule -> {
+          throw new IllegalArgumentException("El consultorio ya tiene una programación en este horario");
+        });
+
+    schedule.setOfficeId(scheduleUpdateDTO.getOfficeId());
+
+    Schedule updatedSchedule = scheduleRepository.save(schedule);
+
+    return mapToResponseDTO(updatedSchedule);
   }
 
   private ScheduleResponseDTO mapToResponseDTO(Schedule schedule) {

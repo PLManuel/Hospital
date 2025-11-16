@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hospital.schedule_service.dto.ScheduleRequestDTO;
 import com.hospital.schedule_service.dto.ScheduleResponseDTO;
+import com.hospital.schedule_service.dto.ScheduleUpdateDTO;
 import com.hospital.schedule_service.service.ScheduleService;
 
 import jakarta.validation.Valid;
@@ -91,6 +93,14 @@ public class ScheduleController {
   public ResponseEntity<Void> enableSchedule(@PathVariable Long id) {
     scheduleService.enableSchedule(id);
     return ResponseEntity.noContent().build();
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<ScheduleResponseDTO> updateSchedule(
+      @PathVariable Long id,
+      @Valid @RequestBody ScheduleUpdateDTO dto) {
+    ScheduleResponseDTO schedule = scheduleService.updateSchedule(id, dto);
+    return ResponseEntity.ok(schedule);
   }
 
 }
