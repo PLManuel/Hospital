@@ -1,5 +1,7 @@
 package com.hospital.appointment_service.dto;
 
+import com.hospital.appointment_service.model.Status;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,5 +23,5 @@ public class AppointmentRequestDTO {
   private Long patientId;
 
   @Builder.Default
-  private Boolean status = true;
+  private Status status = Status.PENDIENTE;
 }
