@@ -1,5 +1,6 @@
 package com.hospital.schedule_service.repository;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -16,6 +17,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
   List<Schedule> findByDoctorDniAndSpecialtyId(String doctorDni, Long specialtyId);
 
   List<Schedule> findByOfficeId(Long officeId);
+
+  List<Schedule> findByDate(LocalDate date);
+
+  List<Schedule> findByDateAndOfficeId(LocalDate date, Long officeId);
 
   List<Schedule> findByStartTimeBetween(LocalTime startTime, LocalTime endTime);
 

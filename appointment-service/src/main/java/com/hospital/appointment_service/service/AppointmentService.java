@@ -69,7 +69,12 @@ public class AppointmentService {
       throw new IllegalArgumentException("El consultorio está deshabilitado");
     }
 
-    BigDecimal finalCost = calculateFinalCost(schedule);
+    if (appointmentRepository.existsByScheduleId(dto.getScheduleId())) {
+      throw new IllegalArgumentException("El horario ya está asignado a otra cita");
+    }
+
+    // BigDecimal finalCost = calculateFinalCost(schedule);
+    BigDecimal finalCost = schedule.getSpecialty().getCost();
 
     Appointment appointment = Appointment.builder()
         .scheduleId(dto.getScheduleId())

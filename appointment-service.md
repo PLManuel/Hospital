@@ -22,7 +22,7 @@ Servicio encargado de la gestión de citas médicas. Maneja la creación, consul
   scheduleId: number,   // ID del horario (requerido)
   employeeDni: string,  // DNI del empleado que crea la cita (requerido)
   patientId: number,    // ID del paciente (requerido)
-  status: boolean       // Estado de la cita (opcional, por defecto true)
+  status: Status       // Estado: "PENDIENTE" | "CANCELADO" | "COMPLETADO" | "NOASISTIO" - opcional
 }
 ```
 
