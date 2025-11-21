@@ -6,11 +6,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.hospital.medical_history_service.client.EmployeeServiceClient;
 import com.hospital.medical_history_service.client.PatientServiceClient;
 import com.hospital.medical_history_service.dto.EmployeeDTO;
+import com.hospital.medical_history_service.exception.CustomException;
 import com.hospital.medical_history_service.dto.MedicalHistoryRequestDTO;
 import com.hospital.medical_history_service.dto.MedicalHistoryResponseDTO;
 import com.hospital.medical_history_service.dto.MedicalHistoryUpdateDTO;
@@ -31,18 +33,18 @@ public class MedicalHistoryService {
   public MedicalHistoryResponseDTO createMedicalHistory(MedicalHistoryRequestDTO dto) {
     PatientDTO patient = patientServiceClient.getPatientById(dto.getPatientId());
     if (patient == null) {
-      throw new IllegalArgumentException("Paciente no encontrado con ID: " + dto.getPatientId());
+      throw new CustomException("Paciente no encontrado con ID: " + dto.getPatientId(), HttpStatus.NOT_FOUND);
     }
     if (Boolean.FALSE.equals(patient.getStatus())) {
-      throw new IllegalArgumentException("El paciente está deshabilitado");
+      throw new CustomException("El paciente está deshabilitado", HttpStatus.BAD_REQUEST);
     }
 
     EmployeeDTO employee = employeeServiceClient.getEmployeeByDni(dto.getEmployeeDni());
     if (employee == null) {
-      throw new IllegalArgumentException("Empleado no encontrado con DNI: " + dto.getEmployeeDni());
+      throw new CustomException("Empleado no encontrado con DNI: " + dto.getEmployeeDni(), HttpStatus.NOT_FOUND);
     }
     if (Boolean.FALSE.equals(employee.getIsEnabled())) {
-      throw new IllegalArgumentException("El empleado está deshabilitado");
+      throw new CustomException("El empleado está deshabilitado", HttpStatus.BAD_REQUEST);
     }
 
     LocalDateTime now = LocalDateTime.now();
@@ -70,14 +72,14 @@ public class MedicalHistoryService {
   public MedicalHistoryResponseDTO getMedicalHistoryByPatientId(Long patientId) {
     MedicalHistory medicalHistory = medicalHistoryRepository.findByPatientId(patientId)
         .orElseThrow(
-            () -> new IllegalArgumentException("Historia médica no encontrada para el paciente con ID: " + patientId));
+            () -> new CustomException("Historia médica no encontrada para el paciente con ID: " + patientId, HttpStatus.NOT_FOUND));
     return mapToResponseDTO(medicalHistory);
   }
 
   public MedicalHistoryResponseDTO getMedicalHistoryById(Long id) {
     @SuppressWarnings("null")
     MedicalHistory medicalHistory = medicalHistoryRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Historia médica no encontrada con ID: " + id));
+        .orElseThrow(() -> new CustomException("Historia médica no encontrada con ID: " + id, HttpStatus.NOT_FOUND));
     return mapToResponseDTO(medicalHistory);
   }
 
@@ -97,7 +99,7 @@ public class MedicalHistoryService {
 
   public List<MedicalHistoryResponseDTO> getMedicalHistoriesByCreatedAtRange(LocalDateTime start, LocalDateTime end) {
     if (start.isAfter(end) || start.isEqual(end)) {
-      throw new IllegalArgumentException("La fecha/hora de inicio debe ser anterior a la de fin");
+      throw new CustomException("La fecha/hora de inicio debe ser anterior a la de fin", HttpStatus.BAD_REQUEST);
     }
     List<MedicalHistory> medicalHistories = medicalHistoryRepository.findByCreatedAtBetween(start, end);
     return medicalHistories.stream()
@@ -107,7 +109,7 @@ public class MedicalHistoryService {
 
   public List<MedicalHistoryResponseDTO> getMedicalHistoriesByUpdatedAtRange(LocalDateTime start, LocalDateTime end) {
     if (start.isAfter(end) || start.isEqual(end)) {
-      throw new IllegalArgumentException("La fecha/hora de inicio debe ser anterior a la de fin");
+      throw new CustomException("La fecha/hora de inicio debe ser anterior a la de fin", HttpStatus.BAD_REQUEST);
     }
     List<MedicalHistory> medicalHistories = medicalHistoryRepository.findByUpdatedAtBetween(start, end);
     return medicalHistories.stream()
@@ -118,7 +120,7 @@ public class MedicalHistoryService {
   public void disableMedicalHistory(Long id) {
     @SuppressWarnings("null")
     MedicalHistory medicalHistory = medicalHistoryRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Historia médica no encontrada con ID: " + id));
+        .orElseThrow(() -> new CustomException("Historia médica no encontrada con ID: " + id, HttpStatus.NOT_FOUND));
     medicalHistory.setStatus(false);
     medicalHistory.setUpdatedAt(LocalDateTime.now());
     medicalHistoryRepository.save(medicalHistory);
@@ -127,7 +129,7 @@ public class MedicalHistoryService {
   public void enableMedicalHistory(Long id) {
     @SuppressWarnings("null")
     MedicalHistory medicalHistory = medicalHistoryRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Historia médica no encontrada con ID: " + id));
+        .orElseThrow(() -> new CustomException("Historia médica no encontrada con ID: " + id, HttpStatus.NOT_FOUND));
     medicalHistory.setStatus(true);
     medicalHistory.setUpdatedAt(LocalDateTime.now());
     medicalHistoryRepository.save(medicalHistory);
@@ -136,7 +138,7 @@ public class MedicalHistoryService {
   public MedicalHistoryResponseDTO updateMedicalHistory(Long id, MedicalHistoryUpdateDTO medicalHistoryUpdateDTO) {
     @SuppressWarnings("null")
     MedicalHistory medicalHistory = medicalHistoryRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Historia médica no encontrada con ID: " + id));
+        .orElseThrow(() -> new CustomException("Historia médica no encontrada con ID: " + id, HttpStatus.NOT_FOUND));
 
     medicalHistory.setWeight(medicalHistoryUpdateDTO.getWeight());
     medicalHistory.setHeight(medicalHistoryUpdateDTO.getHeight());
