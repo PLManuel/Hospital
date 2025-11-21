@@ -6,7 +6,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import com.hospital.schedule_service.exception.CustomException;
 
 import com.hospital.schedule_service.client.DoctorServiceClient;
 import com.hospital.schedule_service.client.EmployeeServiceClient;
@@ -37,28 +40,28 @@ public class ScheduleService {
 
   public ScheduleResponseDTO createSchedule(ScheduleRequestDTO dto) {
     if (dto.getStartTime().isAfter(dto.getEndTime()) || dto.getStartTime().equals(dto.getEndTime())) {
-      throw new IllegalArgumentException("La hora de inicio debe ser anterior a la hora de fin");
+      throw new CustomException("La hora de inicio debe ser anterior a la hora de fin", HttpStatus.BAD_REQUEST);
     }
 
     SpecialtyDTO specialty = specialtyServiceClient.getSpecialtyById(dto.getSpecialtyId());
     if (specialty == null) {
-      throw new IllegalArgumentException("Especialidad no encontrada con ID: " + dto.getSpecialtyId());
+      throw new CustomException("Especialidad no encontrada con ID: " + dto.getSpecialtyId(), HttpStatus.NOT_FOUND);
     }
     if (Boolean.FALSE.equals(specialty.getStatus())) {
-      throw new IllegalArgumentException("La especialidad está deshabilitada");
+      throw new CustomException("La especialidad está deshabilitada", HttpStatus.BAD_REQUEST);
     }
 
     EmployeeDTO employee = employeeServiceClient.getEmployeeByDni(dto.getEmployeeDni());
     if (employee == null) {
-      throw new IllegalArgumentException("Empleado no encontrado con DNI: " + dto.getEmployeeDni());
+      throw new CustomException("Empleado no encontrado con DNI: " + dto.getEmployeeDni(), HttpStatus.NOT_FOUND);
     }
     if (Boolean.FALSE.equals(employee.getIsEnabled())) {
-      throw new IllegalArgumentException("El empleado está deshabilitado");
+      throw new CustomException("El empleado está deshabilitado", HttpStatus.BAD_REQUEST);
     }
 
     DoctorDTO doctor = doctorServiceClient.getDoctorByDni(dto.getDoctorDni());
     if (doctor == null) {
-      throw new IllegalArgumentException("Doctor no encontrado con DNI: " + dto.getDoctorDni());
+      throw new CustomException("Doctor no encontrado con DNI: " + dto.getDoctorDni(), HttpStatus.NOT_FOUND);
     }
 
     boolean doctorHasSpecialty = doctor.getSpecialties() != null &&
@@ -66,22 +69,22 @@ public class ScheduleService {
             .anyMatch(s -> s != null && s.getId() != null && s.getId().equals(dto.getSpecialtyId()));
 
     if (!doctorHasSpecialty) {
-      throw new IllegalArgumentException("El doctor no está asignado a la especialidad: " + specialty.getName());
+      throw new CustomException("El doctor no está asignado a la especialidad: " + specialty.getName(), HttpStatus.BAD_REQUEST);
     }
 
     OfficeDTO office = officeServiceClient.getOfficeById(dto.getOfficeId());
     if (office == null) {
-      throw new IllegalArgumentException("Consultorio no encontrado con ID: " + dto.getOfficeId());
+      throw new CustomException("Consultorio no encontrado con ID: " + dto.getOfficeId(), HttpStatus.NOT_FOUND);
     }
     if (Boolean.FALSE.equals(office.getStatus())) {
-      throw new IllegalArgumentException("El consultorio está deshabilitado");
+      throw new CustomException("El consultorio está deshabilitado", HttpStatus.BAD_REQUEST);
     }
 
     boolean officeHasSpecialty = office.getSpecialtyIds() != null &&
         office.getSpecialtyIds().contains(dto.getSpecialtyId());
 
     if (!officeHasSpecialty) {
-      throw new IllegalArgumentException("El consultorio no está asignado a la especialidad: " + specialty.getName());
+      throw new CustomException("El consultorio no está asignado a la especialidad: " + specialty.getName(), HttpStatus.BAD_REQUEST);
     }
 
     List<Schedule> schedules = scheduleRepository.findByStartTimeBetween(dto.getStartTime(), dto.getEndTime());
@@ -91,7 +94,7 @@ public class ScheduleService {
             dto.getEndTime().isAfter(existingSchedule.getStartTime()))
         .findFirst()
         .ifPresent(existingSchedule -> {
-          throw new IllegalArgumentException("El consultorio ya tiene una programación en este horario");
+          throw new CustomException("El consultorio ya tiene una programación en este horario", HttpStatus.CONFLICT);
         });
 
     Schedule schedule = Schedule.builder()
@@ -133,7 +136,7 @@ public class ScheduleService {
   public ScheduleResponseDTO getScheduleById(Long id) {
     @SuppressWarnings("null")
     Schedule schedule = scheduleRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con ID: " + id));
+        .orElseThrow(() -> new CustomException("Horario no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
     return mapToResponseDTO(schedule);
   }
 
@@ -167,7 +170,7 @@ public class ScheduleService {
 
   public List<ScheduleResponseDTO> getSchedulesByTimeRange(LocalTime startTime, LocalTime endTime) {
     if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
-      throw new IllegalArgumentException("La hora de inicio debe ser anterior a la hora de fin");
+      throw new CustomException("La hora de inicio debe ser anterior a la hora de fin", HttpStatus.BAD_REQUEST);
     }
     List<Schedule> schedules = scheduleRepository.findByStartTimeBetween(startTime, endTime);
     return schedules.stream()
@@ -178,7 +181,7 @@ public class ScheduleService {
   public void disableSchedule(Long id) {
     @SuppressWarnings("null")
     Schedule schedule = scheduleRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con ID: " + id));
+        .orElseThrow(() -> new CustomException("Horario no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
     schedule.setStatus(false);
     scheduleRepository.save(schedule);
   }
@@ -186,7 +189,7 @@ public class ScheduleService {
   public void enableSchedule(Long id) {
     @SuppressWarnings("null")
     Schedule schedule = scheduleRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con ID: " + id));
+        .orElseThrow(() -> new CustomException("Horario no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
     schedule.setStatus(true);
     scheduleRepository.save(schedule);
   }
@@ -194,22 +197,22 @@ public class ScheduleService {
   public ScheduleResponseDTO updateSchedule(Long id, ScheduleUpdateDTO scheduleUpdateDTO) {
     @SuppressWarnings("null")
     Schedule schedule = scheduleRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con ID: " + id));
+        .orElseThrow(() -> new CustomException("Horario no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
 
     OfficeDTO office = officeServiceClient.getOfficeById(scheduleUpdateDTO.getOfficeId());
     if (office == null) {
-      throw new IllegalArgumentException("Consultorio no encontrado con ID: " + scheduleUpdateDTO.getOfficeId());
+      throw new CustomException("Consultorio no encontrado con ID: " + scheduleUpdateDTO.getOfficeId(), HttpStatus.NOT_FOUND);
     }
     if (Boolean.FALSE.equals(office.getStatus())) {
-      throw new IllegalArgumentException("El consultorio está deshabilitado");
+      throw new CustomException("El consultorio está deshabilitado", HttpStatus.BAD_REQUEST);
     }
 
     boolean officeHasSpecialty = office.getSpecialtyIds() != null &&
         office.getSpecialtyIds().contains(schedule.getSpecialtyId());
 
     if (!officeHasSpecialty) {
-      throw new IllegalArgumentException(
-          "El consultorio no está asignado a la especialidad con ID: " + schedule.getOfficeId());
+      throw new CustomException(
+          "El consultorio no está asignado a la especialidad con ID: " + schedule.getOfficeId(), HttpStatus.BAD_REQUEST);
     }
 
     List<Schedule> schedules = scheduleRepository.findByStartTimeBetween(schedule.getStartTime(),
@@ -220,7 +223,7 @@ public class ScheduleService {
             schedule.getEndTime().isAfter(existingSchedule.getStartTime()))
         .findFirst()
         .ifPresent(existingSchedule -> {
-          throw new IllegalArgumentException("El consultorio ya tiene una programación en este horario");
+          throw new CustomException("El consultorio ya tiene una programación en este horario", HttpStatus.CONFLICT);
         });
 
     schedule.setOfficeId(scheduleUpdateDTO.getOfficeId());
