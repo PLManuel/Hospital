@@ -5,9 +5,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.hospital.office_service.client.SpecialtyServiceClient;
+import com.hospital.office_service.exception.CustomException;
 import com.hospital.office_service.dto.OfficeRequestDTO;
 import com.hospital.office_service.dto.OfficeResponseDTO;
 import com.hospital.office_service.model.Office;
@@ -31,8 +33,9 @@ public class OfficeService {
         Set<Long> invalidIds = dto.getSpecialtyIds().stream()
             .filter(id -> !existingSpecialtyIds.contains(id))
             .collect(Collectors.toSet());
-        throw new IllegalArgumentException(
-            "Las siguientes especialidades no existen o están deshabilitadas: " + invalidIds);
+        throw new CustomException(
+            "Las siguientes especialidades no existen o están deshabilitadas: " + invalidIds,
+            HttpStatus.BAD_REQUEST);
       }
     }
 
@@ -54,7 +57,7 @@ public class OfficeService {
   @SuppressWarnings("null")
   public OfficeResponseDTO getOfficeById(Long id) {
     Office office = officeRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Consultorio no encontrado con ID: " + id));
+        .orElseThrow(() -> new CustomException("Consultorio no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
 
     return modelMapper.map(office, OfficeResponseDTO.class);
   }
@@ -62,7 +65,7 @@ public class OfficeService {
   @SuppressWarnings("null")
   public void disableOffice(Long id) {
     Office office = officeRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Consultorio no encontrado con ID: " + id));
+        .orElseThrow(() -> new CustomException("Consultorio no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
 
     office.setStatus(false);
     officeRepository.save(office);
@@ -71,7 +74,7 @@ public class OfficeService {
   @SuppressWarnings("null")
   public void enableOffice(Long id) {
     Office office = officeRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Consultorio no encontrado con ID: " + id));
+        .orElseThrow(() -> new CustomException("Consultorio no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
 
     office.setStatus(true);
     officeRepository.save(office);
