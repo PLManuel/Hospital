@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.hospital.doctor_service.client.EmployeeServiceClient;
@@ -14,6 +15,7 @@ import com.hospital.doctor_service.dto.DoctorRequestDTO;
 import com.hospital.doctor_service.dto.DoctorResponseDTO;
 import com.hospital.doctor_service.dto.EmployeeDTO;
 import com.hospital.doctor_service.dto.SpecialtyDTO;
+import com.hospital.doctor_service.exception.CustomException;
 import com.hospital.doctor_service.model.Doctor;
 import com.hospital.doctor_service.repository.DoctorRepository;
 
@@ -39,7 +41,7 @@ public class DoctorService {
   @Transactional
   public void createDoctor(DoctorRequestDTO dto) {
     if (doctorRepository.findByDni(dto.getDni()).isPresent()) {
-      throw new IllegalArgumentException("Ya existe un doctor con DNI: " + dto.getDni());
+      throw new CustomException("Ya existe un doctor con DNI: " + dto.getDni(), HttpStatus.CONFLICT);
     }
 
     String newCode = generateDoctorCode();
@@ -85,7 +87,7 @@ public class DoctorService {
 
   public DoctorResponseDTO getDoctorByDni(String dni) {
     Doctor doctor = doctorRepository.findByDni(dni)
-        .orElseThrow(() -> new IllegalArgumentException("Doctor no encontrado con DNI: " + dni));
+        .orElseThrow(() -> new CustomException("Doctor no encontrado con DNI: " + dni, HttpStatus.NOT_FOUND));
 
     DoctorResponseDTO responseDTO = modelMapper.map(doctor, DoctorResponseDTO.class);
 
