@@ -39,6 +39,9 @@ public class JwtService {
   }
 
   private Claims extractAllClaims(String token) {
+    if (token == null || token.isEmpty()) {
+      return null;
+    }
     try {
       return Jwts.parser()
           .verifyWith(signingKey)
@@ -52,16 +55,26 @@ public class JwtService {
   }
 
   public boolean isTokenValid(String token) {
+    Claims claims = extractAllClaims(token);
+
+    if (claims == null) {
+      return false;
+    }
+
     try {
-      Claims claims = extractAllClaims(token);
       return claims.getExpiration().after(new Date());
-    } catch (JwtException | IllegalArgumentException e) {
+    } catch (Exception e) {
+      log.error("Error al verificar la expiración del token: {}", e.getMessage());
       return false;
     }
   }
 
   public List<String> getAuthorities(String token) {
     Claims claims = extractAllClaims(token);
+    if (claims == null) {
+      return Collections.emptyList();
+    }
+
     Object authorities = claims.get("authorities");
     if (authorities instanceof List<?>) {
       List<?> authoritiesList = (List<?>) authorities;
