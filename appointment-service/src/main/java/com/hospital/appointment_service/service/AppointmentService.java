@@ -1,7 +1,7 @@
 package com.hospital.appointment_service.service;
 
 import java.math.BigDecimal;
-import java.time.Duration;
+// import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Supplier;
@@ -97,15 +97,15 @@ public class AppointmentService {
     return response;
   }
 
-  private BigDecimal calculateFinalCost(ScheduleDTO schedule) {
-    Duration duration = Duration.between(schedule.getStartTime(), schedule.getEndTime());
-    long minutes = duration.toMinutes();
-    BigDecimal costPerHour = schedule.getSpecialty().getCost();
-    BigDecimal minutesDecimal = new BigDecimal(minutes);
-    BigDecimal hours = minutesDecimal.divide(new BigDecimal(60), 2, java.math.RoundingMode.HALF_UP);
+  // private BigDecimal calculateFinalCost(ScheduleDTO schedule) {
+  //   Duration duration = Duration.between(schedule.getStartTime(), schedule.getEndTime());
+  //   long minutes = duration.toMinutes();
+  //   BigDecimal costPerHour = schedule.getSpecialty().getCost();
+  //   BigDecimal minutesDecimal = new BigDecimal(minutes);
+  //   BigDecimal hours = minutesDecimal.divide(new BigDecimal(60), 2, java.math.RoundingMode.HALF_UP);
 
-    return hours.multiply(costPerHour).setScale(2, java.math.RoundingMode.HALF_UP);
-  }
+  //   return hours.multiply(costPerHour).setScale(2, java.math.RoundingMode.HALF_UP);
+  // }
 
   public List<AppointmentResponseDTO> getAllAppointments() {
     List<Appointment> appointments = appointmentRepository.findAll();
