@@ -5,10 +5,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.hospital.specialty_service.dto.SpecialtyRequestDTO;
 import com.hospital.specialty_service.dto.SpecialtyResponseDTO;
+import com.hospital.specialty_service.exception.CustomException;
 import com.hospital.specialty_service.model.Specialty;
 import com.hospital.specialty_service.repository.SpecialtyRepository;
 
@@ -23,7 +25,7 @@ public class SpecialtyService {
 
   public SpecialtyResponseDTO createSpecialty(SpecialtyRequestDTO requestDTO) {
     if (specialtyRepository.findByName(requestDTO.getName()).isPresent()) {
-      throw new IllegalArgumentException("Ya existe una especialidad con el nombre: " + requestDTO.getName());
+      throw new CustomException("Ya existe una especialidad con el nombre: " + requestDTO.getName(), HttpStatus.CONFLICT);
     }
 
     Specialty specialty = modelMapper.map(requestDTO, Specialty.class);
@@ -42,7 +44,7 @@ public class SpecialtyService {
   public SpecialtyResponseDTO findSpecialtyById(Long id) {
     @SuppressWarnings("null")
     Specialty specialty = specialtyRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID: " + id));
+        .orElseThrow(() -> new CustomException("Especialidad no encontrada con ID: " + id, HttpStatus.NOT_FOUND));
 
     return modelMapper.map(specialty, SpecialtyResponseDTO.class);
   }
@@ -59,7 +61,7 @@ public class SpecialtyService {
   public void disableSpecialty(Long id) {
     @SuppressWarnings("null")
     Specialty specialty = specialtyRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID: " + id));
+        .orElseThrow(() -> new CustomException("Especialidad no encontrada con ID: " + id, HttpStatus.NOT_FOUND));
     
     specialty.setStatus(false);
     specialtyRepository.save(specialty);
@@ -68,7 +70,7 @@ public class SpecialtyService {
   public void enableSpecialty(Long id) {
     @SuppressWarnings("null")
     Specialty specialty = specialtyRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Especialidad no encontrada con ID: " + id));
+        .orElseThrow(() -> new CustomException("Especialidad no encontrada con ID: " + id, HttpStatus.NOT_FOUND));
     
     specialty.setStatus(true);
     specialtyRepository.save(specialty);
