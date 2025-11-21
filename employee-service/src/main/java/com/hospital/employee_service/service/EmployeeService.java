@@ -1,6 +1,7 @@
 package com.hospital.employee_service.service;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.hospital.employee_service.dto.EmployeeRequestDTO;
@@ -10,6 +11,7 @@ import com.hospital.employee_service.dto.EmployeeDTO;
 import com.hospital.employee_service.client.AuthServiceClient;
 import com.hospital.employee_service.client.DoctorServiceClient;
 import com.hospital.employee_service.client.SpecialtyServiceClient;
+import com.hospital.employee_service.exception.CustomException;
 import com.hospital.employee_service.model.Employee;
 import com.hospital.employee_service.model.Role;
 import com.hospital.employee_service.repository.EmployeeRepository;
@@ -35,7 +37,7 @@ public class EmployeeService {
   public EmployeeDTO createEmployee(EmployeeRequestDTO dto) {
 
     if (employeeRepository.findByDni(dto.getDni()).isPresent()) {
-      throw new IllegalArgumentException("El empleado con DNI: " + dto.getDni() + " ya existe.");
+      throw new CustomException("El empleado con DNI: " + dto.getDni() + " ya existe", HttpStatus.CONFLICT);
     }
 
     if (dto.getRole() == Role.DOCTOR && dto.getSpecialtyIds() != null && !dto.getSpecialtyIds().isEmpty()) {
@@ -45,8 +47,8 @@ public class EmployeeService {
         Set<Long> invalidIds = dto.getSpecialtyIds().stream()
             .filter(id -> !existingSpecialtyIds.contains(id))
             .collect(Collectors.toSet());
-        throw new IllegalArgumentException(
-            "Las siguientes especialidades no existen: " + invalidIds);
+        throw new CustomException(
+            "Las siguientes especialidades no existen: " + invalidIds, HttpStatus.BAD_REQUEST);
       }
     }
 
@@ -96,7 +98,7 @@ public class EmployeeService {
 
   public EmployeeDTO getEmployeeByDni(String dni) {
     Employee employee = employeeRepository.findByDni(dni)
-        .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con DNI: " + dni));
+        .orElseThrow(() -> new CustomException("Empleado no encontrado con DNI: " + dni, HttpStatus.NOT_FOUND));
 
     EmployeeDTO employeeDTO = modelMapper.map(employee, EmployeeDTO.class);
 
@@ -115,7 +117,7 @@ public class EmployeeService {
   public EmployeeDTO getEmployeeById(Long id) {
     @SuppressWarnings("null")
     Employee employee = employeeRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con ID: " + id));
+        .orElseThrow(() -> new CustomException("Empleado no encontrado con ID: " + id, HttpStatus.NOT_FOUND));
 
     EmployeeDTO employeeDTO = modelMapper.map(employee, EmployeeDTO.class);
 
