@@ -12,6 +12,9 @@ import com.hospital.employee_service.dto.EmployeeDTO;
 @FeignClient(name = "auth-service")
 public interface AuthServiceClient {
 
+  @GetMapping("/auth/health")
+  String healthCheck();
+
   @PostMapping("/auth/register")
   void registerUser(RegisterRequestDTO request);
 

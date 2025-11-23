@@ -2,12 +2,6 @@
   "configurations": [
     {
       "type": "java",
-      "name": "AppointmentServiceApplication",
-      "request": "launch",
-      "mainClass": "com.hospital.appointment_service.AppointmentServiceApplication"
-    },
-    {
-      "type": "java",
       "name": "Spring Boot-AuthServiceApplication<auth-service>",
       "request": "launch",
       "cwd": "${workspaceFolder}",

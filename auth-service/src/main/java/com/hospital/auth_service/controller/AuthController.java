@@ -26,6 +26,11 @@ public class AuthController {
 
   private final AuthService authService;
 
+  @GetMapping("/health")
+  public ResponseEntity<String> healthCheck() {
+    return ResponseEntity.ok("OK");
+  }
+
   @PostMapping("/login")
   public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody AuthRequestDTO request) {
     AuthResponseDTO response = authService.login(request);
