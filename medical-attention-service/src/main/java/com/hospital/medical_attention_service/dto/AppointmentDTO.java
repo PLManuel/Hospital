@@ -14,8 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AppointmentDTO {
     private Long id;
-    private Long scheduleId;
-    private Long patientId;
+    private ScheduleDTO schedule;
+    private EmployeeDTO employee;
+    private PatientDTO patient;
     private LocalDateTime solicitationDateTime;
     private BigDecimal finalCost;
 }

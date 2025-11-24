@@ -10,9 +10,11 @@ import org.springframework.web.server.ResponseStatusException;
 import com.hospital.medical_attention_service.client.AppointmentServiceClient;
 import com.hospital.medical_attention_service.client.DoctorServiceClient;
 import com.hospital.medical_attention_service.client.MedicalHistoryServiceClient;
+import com.hospital.medical_attention_service.dto.AppointmentDTO;
 import com.hospital.medical_attention_service.dto.DoctorDTO;
 import com.hospital.medical_attention_service.dto.MedicalAttentionRequestDTO;
 import com.hospital.medical_attention_service.dto.MedicalAttentionResponse;
+import com.hospital.medical_attention_service.dto.MedicalHistoryDTO;
 import com.hospital.medical_attention_service.exception.CustomException;
 import com.hospital.medical_attention_service.model.MedicalAttention;
 import com.hospital.medical_attention_service.repository.MedicalAttentionRepository;
@@ -32,31 +34,10 @@ public class MedicalAttentionService {
     @Transactional
     public MedicalAttentionResponse create(MedicalAttentionRequestDTO dto) {
 
-        // Validar cita
-        try {
-            if (appointmentClient.getAppointmentById(dto.getAppointmentId()) == null)
-                throw new IllegalStateException();
-        } catch (Exception e) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_GATEWAY, 
-                "No se pudo validar la cita con ID " + dto.getAppointmentId());
-        }
-
-        // Validar doctor
-        DoctorDTO doctor = doctorClient.getDoctorByDni(dto.getDoctorDni());
-        if (doctor == null) {
-        throw new CustomException("Doctor no encontrado con DNI: " + dto.getDoctorDni(), HttpStatus.NOT_FOUND);
-        }
-
-        // Validar historia médica
-        try {
-            if (historyClient.getMedicalHistoryById(dto.getMedicalHistoryId()) == null)
-                throw new IllegalStateException();
-        } catch (Exception e) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_GATEWAY, 
-                "No se pudo validar la historia médica con ID " + dto.getMedicalHistoryId());
-        }
+        // Traer y validar objetos remotos
+        AppointmentDTO appointment = getAppointmentOrThrow(dto.getAppointmentId());
+        DoctorDTO doctor = getDoctorOrThrow(dto.getDoctorDni());
+        MedicalHistoryDTO history = getHistoryOrThrow(dto.getMedicalHistoryId());
 
         MedicalAttention entity = MedicalAttention.builder()
                 .appointmentId(dto.getAppointmentId())
@@ -68,7 +49,61 @@ public class MedicalAttentionService {
                 .notes(dto.getNotes())
                 .build();
 
-        return toResponse(repository.save(entity));
+        MedicalAttention saved = repository.save(entity);
+
+        // Armamos respuesta rica, como en Schedule
+        return MedicalAttentionResponse.builder()
+                .id(saved.getId())
+                .appointment(appointment)
+                .doctor(doctor)
+                .medicalHistory(history)
+                .attentionDateTime(saved.getAttentionDateTime())
+                .diagnosis(saved.getDiagnosis())
+                .treatment(saved.getTreatment())
+                .notes(saved.getNotes())
+                .build();
+    }
+
+
+    // GET by ID
+    @Transactional
+    public MedicalAttentionResponse getById(Long id) {
+        return repository.findById(id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Atención médica no encontrada"));
+    }
+
+    // GET by doctor
+    @Transactional
+    public List<MedicalAttentionResponse> getByDoctorDni(String doctorDni) {
+        return repository.findByDoctorDni(doctorDni)
+                .stream().map(this::toResponse).toList();
+    }
+
+    // LIST
+    @Transactional
+    public List<MedicalAttentionResponse> list() {
+        return repository.findAll().stream()
+                .map(this::toResponse).toList();
+    }
+
+    private MedicalAttentionResponse toResponse(MedicalAttention m) {
+
+        AppointmentDTO appointment = getAppointmentOrThrow(m.getAppointmentId());
+        DoctorDTO doctor = getDoctorOrThrow(m.getDoctorDni());
+        MedicalHistoryDTO history = getHistoryOrThrow(m.getMedicalHistoryId());
+
+        return MedicalAttentionResponse.builder()
+                .id(m.getId())
+                .appointment(appointment)
+                .doctor(doctor)
+                .medicalHistory(history)
+                .attentionDateTime(m.getAttentionDateTime())
+                .diagnosis(m.getDiagnosis())
+                .treatment(m.getTreatment())
+                .notes(m.getNotes())
+                .build();
     }
 
     // UPDATE
@@ -94,40 +129,53 @@ public class MedicalAttentionService {
         repository.deleteById(id);
     }
 
-    // GET by ID
-    @Transactional
-    public MedicalAttentionResponse getById(Long id) {
-        return repository.findById(id)
-                .map(this::toResponse)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Atención médica no encontrada"));
+    private AppointmentDTO getAppointmentOrThrow(Long id) {
+        try {
+            AppointmentDTO dto = appointmentClient.getAppointmentById(id);
+            if (dto == null) {
+                throw new IllegalStateException("Cita no encontrada");
+            }
+            return dto;
+        } catch (Exception ex) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_GATEWAY,
+                "No se pudo validar la cita con ID " + id,
+                ex
+            );
+        }
     }
 
-    // GET by doctor
-    @Transactional
-    public List<MedicalAttentionResponse> getByDoctorDni(String doctorDni) {
-        return repository.findByDoctorDni(doctorDni)
-                .stream().map(this::toResponse).toList();
+    private DoctorDTO getDoctorOrThrow(String dni) {
+        try {
+            DoctorDTO dto = doctorClient.getDoctorByDni(dni);
+            if (dto == null) {
+                throw new CustomException("Doctor no encontrado con DNI: " + dni, HttpStatus.NOT_FOUND);
+            }
+            return dto;
+        } catch (CustomException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_GATEWAY,
+                "No se pudo validar el doctor con DNI " + dni,
+                ex
+            );
+        }
     }
 
-    // LIST
-    @Transactional
-    public List<MedicalAttentionResponse> list() {
-        return repository.findAll().stream()
-                .map(this::toResponse).toList();
-    }
-
-    // Converter
-    private MedicalAttentionResponse toResponse(MedicalAttention m) {
-        return MedicalAttentionResponse.builder()
-                .id(m.getId())
-                .appointmentId(m.getAppointmentId())
-                .doctorDni(m.getDoctorDni())
-                .medicalHistoryId(m.getMedicalHistoryId())
-                .attentionDateTime(m.getAttentionDateTime())
-                .diagnosis(m.getDiagnosis())
-                .treatment(m.getTreatment())
-                .notes(m.getNotes())
-                .build();
+    private MedicalHistoryDTO getHistoryOrThrow(Long id) {
+        try {
+            MedicalHistoryDTO dto = historyClient.getMedicalHistoryById(id);
+            if (dto == null) {
+                throw new IllegalStateException("Historia no encontrada");
+            }
+            return dto;
+        } catch (Exception ex) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_GATEWAY,
+                "No se pudo validar la historia médica con ID " + id,
+                ex
+            );
+        }
     }
 }

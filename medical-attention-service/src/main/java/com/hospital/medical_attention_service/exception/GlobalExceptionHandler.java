@@ -47,7 +47,9 @@ public class GlobalExceptionHandler {
     errorResponse.put("timestamp", LocalDateTime.now());
     errorResponse.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
     errorResponse.put("error", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-    errorResponse.put("message", "Error interno del servidor");
+    errorResponse.put("message", 
+    "Error interno: " + ex.getClass().getSimpleName() + 
+    " → " + ex.getMessage());
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }

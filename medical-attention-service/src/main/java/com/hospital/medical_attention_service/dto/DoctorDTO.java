@@ -15,4 +15,5 @@ public class DoctorDTO {
     private String name;
     private String lastname;
     private String codigo;
+    
 }

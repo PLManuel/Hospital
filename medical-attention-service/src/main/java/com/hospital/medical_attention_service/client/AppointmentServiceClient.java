@@ -8,6 +8,6 @@ import com.hospital.medical_attention_service.dto.AppointmentDTO;
 
 @FeignClient(name= "appointment-service")
 public interface AppointmentServiceClient {
-    @GetMapping("/appointment/{id}")
+    @GetMapping("/appointments/{id}")
     AppointmentDTO getAppointmentById(@PathVariable Long id);
 }
