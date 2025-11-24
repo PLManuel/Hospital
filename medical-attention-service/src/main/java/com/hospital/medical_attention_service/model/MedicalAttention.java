@@ -1,6 +1,7 @@
 package com.hospital.medical_attention_service.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,4 +45,8 @@ public class MedicalAttention {
 
     @Column(nullable = true)
     private String notes;
+
+    private List<String> analyses;
+    
+    private List<String> prescriptions;
 }
