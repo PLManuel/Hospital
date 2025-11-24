@@ -49,10 +49,10 @@ public class MedicalAttentionController {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    @GetMapping("/by-doctor/{doctorId}")
+    @GetMapping("/by-doctor/{doctorDni}")
     public ResponseEntity<List<MedicalAttentionResponse>> getByDoctor(
-            @PathVariable Long doctorId) {
-        return ResponseEntity.ok(service.getByDoctor(doctorId));
+            @PathVariable String doctorDni) {
+        return ResponseEntity.ok(service.getByDoctorDni(doctorDni));
     }
 
     @GetMapping

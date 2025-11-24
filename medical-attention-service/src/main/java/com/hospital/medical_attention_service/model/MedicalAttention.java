@@ -1,8 +1,6 @@
 package com.hospital.medical_attention_service.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "medical-attention")
+@Table(name = "medical_attention")
 public class MedicalAttention {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +27,7 @@ public class MedicalAttention {
     private Long appointmentId;
 
     @Column(nullable = false)
-    private Long doctorId;
+    private String doctorDni;
 
     @Column(nullable = false)
     private Long medicalHistoryId;
@@ -45,8 +43,4 @@ public class MedicalAttention {
 
     @Column(nullable = true)
     private String notes;
-
-    private List<String> analyses;
-    
-    private List<String> prescriptions;
 }

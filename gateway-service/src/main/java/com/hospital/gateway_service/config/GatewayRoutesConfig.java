@@ -580,7 +580,7 @@ public class GatewayRoutesConfig {
             .uri("lb://medical-attention-service"))
 
         .route("get_medical_attention_by_doctor", r -> r
-            .path("/api/medical-attention/by-doctor/{doctorId}")
+            .path("/api/medical-attention/by-doctor/{doctorDni}")
             .and().method(HttpMethod.GET)
             .filters(f -> f
                 .stripPrefix(1)

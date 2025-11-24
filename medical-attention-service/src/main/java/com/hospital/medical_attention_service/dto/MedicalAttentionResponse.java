@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class MedicalAttentionResponse {
     private Long id;
     private Long appointmentId;
-    private Long doctorId;
+    private String doctorDni;
     private Long medicalHistoryId;
     private LocalDateTime attentionDateTime;
     private String diagnosis;

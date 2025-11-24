@@ -10,8 +10,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.hospital.medical_attention_service.client.AppointmentServiceClient;
 import com.hospital.medical_attention_service.client.DoctorServiceClient;
 import com.hospital.medical_attention_service.client.MedicalHistoryServiceClient;
+import com.hospital.medical_attention_service.dto.DoctorDTO;
 import com.hospital.medical_attention_service.dto.MedicalAttentionRequestDTO;
 import com.hospital.medical_attention_service.dto.MedicalAttentionResponse;
+import com.hospital.medical_attention_service.exception.CustomException;
 import com.hospital.medical_attention_service.model.MedicalAttention;
 import com.hospital.medical_attention_service.repository.MedicalAttentionRepository;
 
@@ -41,13 +43,9 @@ public class MedicalAttentionService {
         }
 
         // Validar doctor
-        try {
-            if (doctorClient.getDoctorByDni(dto.getDoctorId().toString()) == null)
-                throw new IllegalStateException();
-        } catch (Exception e) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_GATEWAY, 
-                "No se pudo validar el médico con ID " + dto.getDoctorId());
+        DoctorDTO doctor = doctorClient.getDoctorByDni(dto.getDoctorDni());
+        if (doctor == null) {
+        throw new CustomException("Doctor no encontrado con DNI: " + dto.getDoctorDni(), HttpStatus.NOT_FOUND);
         }
 
         // Validar historia médica
@@ -62,14 +60,12 @@ public class MedicalAttentionService {
 
         MedicalAttention entity = MedicalAttention.builder()
                 .appointmentId(dto.getAppointmentId())
-                .doctorId(dto.getDoctorId())
+                .doctorDni(dto.getDoctorDni())
                 .medicalHistoryId(dto.getMedicalHistoryId())
                 .attentionDateTime(LocalDateTime.now())
                 .diagnosis(dto.getDiagnosis())
                 .treatment(dto.getTreatment())
                 .notes(dto.getNotes())
-                .analyses(null)
-                .prescriptions(null) 
                 .build();
 
         return toResponse(repository.save(entity));
@@ -109,8 +105,8 @@ public class MedicalAttentionService {
 
     // GET by doctor
     @Transactional
-    public List<MedicalAttentionResponse> getByDoctor(Long doctorId) {
-        return repository.findByDoctorId(doctorId)
+    public List<MedicalAttentionResponse> getByDoctorDni(String doctorDni) {
+        return repository.findByDoctorDni(doctorDni)
                 .stream().map(this::toResponse).toList();
     }
 
@@ -126,7 +122,7 @@ public class MedicalAttentionService {
         return MedicalAttentionResponse.builder()
                 .id(m.getId())
                 .appointmentId(m.getAppointmentId())
-                .doctorId(m.getDoctorId())
+                .doctorDni(m.getDoctorDni())
                 .medicalHistoryId(m.getMedicalHistoryId())
                 .attentionDateTime(m.getAttentionDateTime())
                 .diagnosis(m.getDiagnosis())

@@ -1,7 +1,5 @@
 package com.hospital.medical_attention_service.dto;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,9 +19,8 @@ public class MedicalAttentionRequestDTO {
     @Positive(message = "La ID de la cita debe ser un número positivo")
     private Long appointmentId;
 
-    @NotNull(message = "La ID del médico es obligatoria")
-    @Positive(message = "La ID del médico debe ser un número positivo")
-    private Long doctorId;
+    @NotNull(message = "El DNI del médico es obligatorio")
+    private String doctorDni;
 
     @NotNull(message = "La ID de la historia médica es obligatoria")
     @Positive(message = "La ID de la historia médica debe ser un número positivo")
@@ -38,8 +35,4 @@ public class MedicalAttentionRequestDTO {
 
     @Size(max = 255, message = "La nota no puede exceder los 255 caracteres")
     private String notes;
-
-    private List<String> analyses;
-
-    private List<String> recipes;
 }
