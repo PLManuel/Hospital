@@ -1,5 +1,5 @@
 # Schedule Service
-[⬅ Volver al índice](./README.md)
+[⬅ Volver al índice](../README.md)
 
 
 Servicio encargado de la gestión de horarios médicos. Maneja la creación, consulta y administración de los horarios de disponibilidad de los doctores.

@@ -1,5 +1,5 @@
 # Auth Service
-[⬅ Volver al índice](./README.md)
+[⬅ Volver al índice](../README.md)
 
 
 Servicio encargado de la autenticación y autorización de usuarios en el sistema. Gestiona el login, generación de tokens JWT y control de acceso.

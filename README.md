@@ -38,17 +38,18 @@ fetch('http://localhost:8080/api/auth/register', {
 ---
 ## 📚 Índice de microservicios
 
-| Microservicio            | Descripción                                  | Documento |
-|--------------------------|----------------------------------------------|-----------|
-| Auth Service             | Login, tokens JWT y estado de usuarios       | [auth-service.md](./auth-service.md) |
-| Employee Service         | Gestión de empleados                         | [employee-service.md](./employee-service.md) |
-| Specialty Service        | Gestión de especialidades médicas            | [specialty-service.md](./specialty-service.md) |
-| Doctor Service           | Gestión de doctores y sus especialidades     | [doctor-service.md](./doctor-service.md) |
-| Patient Service          | Gestión de pacientes                         | [patient-service.md](./patient-service.md) |
-| Office Service           | Gestión de consultorios                      | [office-service.md](./office-service.md) |
-| Schedule Service         | Gestión de horarios médicos                  | [schedule-service.md](./schedule-service.md) |
-| Appointment Service      | Gestión de citas médicas                     | [appointment-service.md](./appointment-service.md) |
-| Medical History Service  | Gestión de historiales médicos               | [medical-history-service.md](./medical-history-service.md) |
-| Receipt Service          | Gestión de comprobantes de pago              | [receipt-service.md](./receipt-service.md) |
+| Microservicio             | Descripción                              | Documento |
+|---------------------------|------------------------------------------|-----------|
+| Auth Service              | Login, tokens JWT y estado de usuarios   | [auth-service.md](./auth-service/README.md) |
+| Employee Service          | Gestión de empleados                     | [employee-service.md](./employee-service/README.md) |
+| Specialty Service         | Gestión de especialidades médicas        | [specialty-service.md](./specialty-service/README.md) |
+| Doctor Service            | Gestión de doctores y sus especialidades | [doctor-service.md](./doctor-service/README.md) |
+| Patient Service           | Gestión de pacientes                     | [patient-service.md](./patient-service/README.md) |
+| Office Service            | Gestión de consultorios                  | [office-service.md](./office-service/README.md) |
+| Schedule Service          | Gestión de horarios médicos              | [schedule-service.md](./schedule-service/README.md) |
+| Appointment Service       | Gestión de citas médicas                 | [appointment-service.md](./appointment-service/README.md) |
+| Medical History Service   | Gestión de historiales médicos           | [medical-history-service.md](./medical-history-service/README.md) |
+| Receipt Service           | Gestión de comprobantes de pago          | [receipt-service.md](./receipt-service/README.md) |
+| Medical Attention Service | Gestión de atenciones medicas            | [medical-attention-service.md](./medical-attention-service/README.md) |
 
 > Para el detalle de cada microservicio, revisa su documento correspondiente.

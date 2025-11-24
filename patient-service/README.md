@@ -1,5 +1,5 @@
 # Patient Service
-[⬅ Volver al índice](./README.md)
+[⬅ Volver al índice](../README.md)
 
 
 Servicio encargado de la gestión de pacientes del hospital. Maneja el registro, consulta y administración de la información de los pacientes.

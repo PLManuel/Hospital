@@ -1,5 +1,5 @@
 # Doctor Service
-[⬅ Volver al índice](./README.md)
+[⬅ Volver al índice](../README.md)
 
 
 Servicio encargado de la gestión de doctores del hospital. Maneja el registro y consulta de doctores con sus especialidades asignadas.

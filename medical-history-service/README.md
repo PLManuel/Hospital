@@ -1,5 +1,5 @@
 # Medical History Service
-[⬅ Volver al índice](./README.md)
+[⬅ Volver al índice](../README.md)
 
 
 Servicio encargado de la gestión de historiales médicos de los pacientes. Maneja la creación, consulta y administración de los historiales médicos con sus atenciones médicas.

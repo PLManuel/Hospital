@@ -1,5 +1,5 @@
 # Specialty Service
-[⬅ Volver al índice](./README.md)
+[⬅ Volver al índice](../README.md)
 
 
 Servicio encargado de la gestión de especialidades médicas. Maneja la creación, consulta y administración de las especialidades disponibles en el hospital.

@@ -1,5 +1,5 @@
 # Office Service
-[⬅ Volver al índice](./README.md)
+[⬅ Volver al índice](../README.md)
 
 
 Servicio encargado de la gestión de consultorios del hospital. Maneja el registro, consulta y administración de los consultorios médicos con sus especialidades asignadas.
