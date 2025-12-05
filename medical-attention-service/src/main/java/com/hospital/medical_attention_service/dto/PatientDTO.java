@@ -1,7 +1,6 @@
 package com.hospital.medical_attention_service.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,10 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppointmentDTO {
+public class PatientDTO {
   private Long id;
-  private ScheduleDTO schedule;
-  private PatientDTO patient;
-  private LocalDateTime solicitationDateTime;
-  private BigDecimal finalCost;
+  private String dni;
+  private String name;
+  private String lastname;
+  private LocalDate birthdate;
+  private String gender;
 }

@@ -10,10 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DoctorDTO {
-    private Long id;
-    private String dni;
-    private String name;
-    private String lastname;
-    private String codigo;
-    
+  private Long id;
+  private String dni;
+  private String name;
+  private String lastname;
+  private String codigo;
 }

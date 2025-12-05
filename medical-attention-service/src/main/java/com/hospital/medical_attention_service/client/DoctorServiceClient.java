@@ -8,6 +8,6 @@ import com.hospital.medical_attention_service.dto.DoctorDTO;
 
 @FeignClient(name = "doctor-service")
 public interface DoctorServiceClient {
-    @GetMapping("/doctors/dni/{dni}")
-    DoctorDTO getDoctorByDni(@PathVariable String dni);
+  @GetMapping("/doctors/dni/{dni}")
+  DoctorDTO getDoctorByDni(@PathVariable String dni);
 }

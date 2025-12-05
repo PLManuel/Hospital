@@ -14,10 +14,8 @@ import lombok.NoArgsConstructor;
 public class MedicalHistoryDTO {
   private Long id;
   private PatientDTO patient;
-  private EmployeeDTO employee;
   private BigDecimal height; 
   private BigDecimal weight;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-  private Boolean status;
 }

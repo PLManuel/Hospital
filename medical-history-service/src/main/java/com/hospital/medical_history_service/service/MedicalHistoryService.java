@@ -1,6 +1,7 @@
 package com.hospital.medical_history_service.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -10,8 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.hospital.medical_history_service.client.EmployeeServiceClient;
+import com.hospital.medical_history_service.client.MedicalAttentionServiceClient;
 import com.hospital.medical_history_service.client.PatientServiceClient;
 import com.hospital.medical_history_service.dto.EmployeeDTO;
+import com.hospital.medical_history_service.dto.MedicalAttentionDTO;
+import com.hospital.medical_history_service.dto.MedicalAttentionSimpleDTO;
 import com.hospital.medical_history_service.exception.CustomException;
 import com.hospital.medical_history_service.dto.MedicalHistoryRequestDTO;
 import com.hospital.medical_history_service.dto.MedicalHistoryResponseDTO;
@@ -28,6 +32,7 @@ public class MedicalHistoryService {
   private final MedicalHistoryRepository medicalHistoryRepository;
   private final PatientServiceClient patientServiceClient;
   private final EmployeeServiceClient employeeServiceClient;
+  private final MedicalAttentionServiceClient medicalAttentionServiceClient;
   private final ModelMapper modelMapper;
 
   public MedicalHistoryResponseDTO createMedicalHistory(MedicalHistoryRequestDTO dto) {
@@ -164,8 +169,22 @@ public class MedicalHistoryService {
         () -> patientServiceClient.getPatientById(medicalHistory.getPatientId())));
     response.setEmployee(getServiceData(
         () -> employeeServiceClient.getEmployeeByDni(medicalHistory.getEmployeeDni())));
-    response.setMedicalAttentions(null);
-
+    
+    
+    // Obtener las atenciones médicas asociadas y simplificarlas
+    List<MedicalAttentionSimpleDTO> attentions = getServiceData(
+        () -> medicalAttentionServiceClient.getAttentionsByMedicalHistoryId(medicalHistory.getId()));
+    
+    // Convertir a MedicalAttentionDTO (sin la referencia circular a MedicalHistory)
+    if (attentions != null) {
+        response.setMedicalAttentions(
+                attentions.stream()
+                        .map(att -> modelMapper.map(att, MedicalAttentionDTO.class))
+                        .collect(Collectors.toList())
+        );
+    } else {
+        response.setMedicalAttentions(Collections.emptyList());
+    }
     return response;
   }
 

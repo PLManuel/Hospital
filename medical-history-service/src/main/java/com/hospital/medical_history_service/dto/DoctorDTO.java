@@ -1,4 +1,4 @@
-package com.hospital.medical_attention_service.dto;
+package com.hospital.medical_history_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpecialtyDTO {
+
+public class DoctorDTO {
   private Long id;
+  private String dni;
   private String name;
-  private String description;
+  private String lastname;
+  private String codigo;
 }

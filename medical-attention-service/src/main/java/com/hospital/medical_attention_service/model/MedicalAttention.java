@@ -19,28 +19,28 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "medical_attention")
 public class MedicalAttention {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false)
-    private Long appointmentId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String doctorDni;
+  @Column(nullable = false)
+  private Long appointmentId;
 
-    @Column(nullable = false)
-    private Long medicalHistoryId;
+  @Column(nullable = false)
+  private String doctorDni;
 
-    @Column(nullable = false)
-    private LocalDateTime attentionDateTime;
+  @Column(nullable = false)
+  private Long medicalHistoryId;
 
-    @Column(nullable = false)
-    private String diagnosis;
+  @Column(nullable = false)
+  private LocalDateTime attentionDateTime;
 
-    @Column(nullable = false)
-    private String treatment;
+  @Column(nullable = false)
+  private String diagnosis;
 
-    @Column(nullable = true)
-    private String notes;
+  @Column(nullable = false)
+  private String treatment;
+
+  @Column(nullable = true)
+  private String notes;
 }
