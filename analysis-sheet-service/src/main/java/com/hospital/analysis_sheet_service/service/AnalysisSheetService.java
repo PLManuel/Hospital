@@ -78,6 +78,8 @@ public class AnalysisSheetService {
             lineRepo.save(line);
         }
 
+        cartClient.limpiarCarrito();
+
         sheet.setStatus("Completed");
         sheetRepo.save(sheet);
     }
