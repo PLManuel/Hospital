@@ -3,7 +3,6 @@ package com.hospital.analysis_sheet_service.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hospital.analysis_sheet_service.client.AnalysisCartServiceClient;
@@ -15,18 +14,15 @@ import com.hospital.analysis_sheet_service.model.AnalysisSheetLine;
 import com.hospital.analysis_sheet_service.repository.AnalysisSheetLineRepository;
 import com.hospital.analysis_sheet_service.repository.AnalysisSheetRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AnalysisSheetService {
-    @Autowired
-    private AnalysisSheetRepository sheetRepo;
-
-    @Autowired
-    private AnalysisSheetLineRepository lineRepo;
-
-    @Autowired
-    private AnalysisCartServiceClient cartClient;
-
-    private MedicalAttentionServiceClient attentionClient;
+    private final AnalysisSheetRepository sheetRepo;
+    private final AnalysisSheetLineRepository lineRepo;
+    private final AnalysisCartServiceClient cartClient;
+    private final MedicalAttentionServiceClient attentionClient;
 
     // Crear ficha vacía
     public AnalysisSheet crear(AnalysisSheet sheet) {
