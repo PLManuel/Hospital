@@ -631,8 +631,63 @@ public class GatewayRoutesConfig {
                     Role.ADMIN.getRoleName()
                 )))
             .uri("lb://medical-attention-service"))
-        // ----------------------------------------------------//
+        // ------------------------------------ TIPO ANALISIS ----------------//
 
+        .route("create_type_analysis", r -> r
+            .path("/api/type-analysis")
+            .and().method(HttpMethod.POST)
+            .filters(f -> f
+                .stripPrefix(1) // /api/type-analysis -> /type-analysis
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://type-analysis-service"))
+
+        .route("get_all_type_analysis", r -> r
+            .path("/api/type-analysis")
+            .and().method(HttpMethod.GET)
+            .filters(f -> f
+                .stripPrefix(1)
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://type-analysis-service"))
+
+        .route("get_type_analysis_by_id", r -> r
+            .path("/api/type-analysis/{id}")
+            .and().method(HttpMethod.GET)
+            .filters(f -> f
+                .stripPrefix(1)
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://type-analysis-service"))
+
+        .route("update_type_analysis", r -> r
+            .path("/api/type_analysis/{id}")
+            .and().method(HttpMethod.PUT)
+            .filters(f -> f
+                .stripPrefix(1)
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://type_analysis-service"))
+
+        .route("delete_type_analysis", r -> r
+            .path("/api/type_analysis/{id}")
+            .and().method(HttpMethod.DELETE)
+            .filters(f -> f
+                .stripPrefix(1)
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://type_analysis-service"))
+
+
+        //----------------------------------------------------//
+
+        
+        //----------------------------------------------------//
         
         .build();
   }
