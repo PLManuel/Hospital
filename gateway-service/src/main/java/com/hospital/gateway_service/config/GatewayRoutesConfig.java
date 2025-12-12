@@ -684,8 +684,47 @@ public class GatewayRoutesConfig {
             .uri("lb://type_analysis-service"))
 
 
-        //----------------------------------------------------//
+        //----------------------------- CARRITO ANALISIS -----------------------//
 
+        .route("agregar_analysis_cart", r -> r
+            .path("/api/analysis-cart/agregar")
+            .and().method(HttpMethod.POST)
+            .filters(f -> f
+                .stripPrefix(1) // /api/type-analysis -> /type-analysis
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://analysis-cart"))
+
+        .route("get_all_type_analysis", r -> r
+            .path("/api/analysis-cart/listar")
+            .and().method(HttpMethod.GET)
+            .filters(f -> f
+                .stripPrefix(1)
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://analysis-cart"))
+
+        .route("delete_analysis-cart", r -> r
+            .path("/api/analysis-cart/quitar/{id}")
+            .and().method(HttpMethod.DELETE)
+            .filters(f -> f
+                .stripPrefix(1)
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://analysis-cart"))
+
+        .route("nuevo_analysis-cart", r -> r
+            .path("/api/analysis-cart/nuevo")
+            .and().method(HttpMethod.DELETE)
+            .filters(f -> f
+                .stripPrefix(1)
+                .filter(AuthorizationFilter.ofAny(
+                    Role.ADMIN.getRoleName()
+                )))
+            .uri("lb://analysis-cart"))
         
         //----------------------------------------------------//
         
