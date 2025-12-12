@@ -22,7 +22,6 @@ public class AnalysisCartItem {
     private Long id;
 
     private Long typeAnalysisId;
-    private Long analysisSheetId;
     private String observations;
     private Integer quantity;
 }

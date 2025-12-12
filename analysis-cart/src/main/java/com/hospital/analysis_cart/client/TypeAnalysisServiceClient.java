@@ -9,5 +9,5 @@ import com.hospital.analysis_cart.dto.TypeAnalysisDTO;
 @FeignClient(name = "type-analysis-service")
 public interface TypeAnalysisServiceClient {
     @GetMapping("/type-analysis/{id}")
-    TypeAnalysisDTO findById(@PathVariable Long typeAnalysisId);
+    TypeAnalysisDTO findById(@PathVariable("id") Long typeAnalysisId);
 }

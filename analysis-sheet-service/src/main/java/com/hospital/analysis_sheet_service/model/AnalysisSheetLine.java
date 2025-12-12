@@ -20,7 +20,6 @@ public class AnalysisSheetLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long analysisSheetId;
     private Long typeAnalysisId;
     private String observations;
